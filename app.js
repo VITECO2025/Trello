@@ -16,7 +16,7 @@ const LS_KEY = "KANBAN_DEMO_V1";
 function loadData() {
   const raw = localStorage.getItem(LS_KEY);
   if (raw) return JSON.parse(raw);
-  const init = seed.map(x => ({...x, Notes: "" }));
+  const init = seed.map(x => ({...x, Comments: [], Attachments: [] }));
   localStorage.setItem(LS_KEY, JSON.stringify(init));
   return init;
 }
