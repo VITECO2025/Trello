@@ -39,7 +39,10 @@ const elMMeta = document.getElementById("mMeta");
 const elNote = document.getElementById("note");
 const elSaveNote = document.getElementById("saveNote");
 const elQuick = document.getElementById("quick");
-
+const elCommentList = document.getElementById("commentList");
+const elAttach = document.getElementById("attach");
+const elFile = document.getElementById("file");
+const elAttachList = document.getElementById("attachList");
 function uniq(arr){ return [...new Set(arr)].filter(Boolean); }
 
 function isOverdue(dateStr){
@@ -62,7 +65,46 @@ function pctBucket(p){
   if (n <= 70) return "30-70";
   return "70-100";
 }
+function renderComments_(){
+  const cs = selected?.Comments || [];
+  if(!cs.length){
+    elCommentList.innerHTML = `<div class="small">Chưa có trao đổi.</div>`;
+    return;
+  }
+  elCommentList.innerHTML = cs.map(c=>`
+    <div style="border:1px solid #22314a;border-radius:12px;padding:8px;background:#111c33">
+      <div class="row" style="justify-content:space-between">
+        <div class="small"><b>${c.by}</b></div>
+        <div class="small">${c.at}</div>
+      </div>
+      <div style="margin-top:6px;white-space:pre-wrap">${escapeHtml_(c.text)}</div>
+    </div>
+  `).join("");
+  elCommentList.scrollTop = elCommentList.scrollHeight;
+}
 
+function renderAttachments_(){
+  const as = selected?.Attachments || [];
+  if(!as.length){ elAttachList.innerHTML = `<span class="small">Chưa có file.</span>`; return; }
+
+  elAttachList.innerHTML = as.map((a,idx)=>{
+    const isImg = a.type?.startsWith("image/");
+    if (isImg && a.dataUrl){
+      return `<span class="pill"><a href="${a.dataUrl}" target="_blank" style="color:#e5e7eb;text-decoration:none">🖼 ${a.name}</a></span>`;
+    }
+    // file khác: demo chỉ hiện tên (không lưu nội dung nặng)
+    return `<span class="pill">📎 ${a.name}</span>`;
+  }).join("");
+}
+
+function escapeHtml_(s){
+  return String(s||"")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
 function applyFilters(list){
   const q = (elQ.value || "").toLowerCase().trim();
   const sale = elSale.value;
@@ -177,7 +219,9 @@ function openModal(orderCode){
     <span class="pill">Value: ${selected.Value?`₫${Number(selected.Value).toLocaleString('vi-VN')}`:"—"}</span>
     <span class="pill">${isOverdue(selected.Deadline)?"Quá hạn":"Đúng hạn/Chưa tới"}</span>
   `;
-  elNote.value = selected.Notes || "";
+  renderComments_();
+renderAttachments_();
+elNote.value = "";
   elModal.classList.add("show");
 }
 
@@ -186,11 +230,22 @@ elModal.addEventListener("click",(e)=>{ if(e.target===elModal) elModal.classList
 
 elSaveNote.onclick = ()=>{
   if(!selected) return;
+  const text = (elNote.value || "").trim();
+  if(!text) return;
+
   const idx = items.findIndex(x=>x.OrderCode===selected.OrderCode);
-  items[idx].Notes = elNote.value;
+  const by = getUserName();
+
+  items[idx].Comments = items[idx].Comments || [];
+  items[idx].Comments.push({ by, at: nowStr(), text });
+
   saveData(items);
-  elModal.classList.remove("show");
-  render();
+  selected = items[idx];
+
+  elNote.value = "";
+  renderComments_();
+  render(); // update badges nếu sau này anh muốn hiện số comment
+};
 };
 
 [elQ, elSale, elDeadline, elPct].forEach(el=> el.addEventListener("input", render));
@@ -199,5 +254,43 @@ elReset.onclick = ()=>{
   items = loadData();
   render();
 };
+elAttach.onclick = ()=> elFile.click();
 
+elFile.onchange = async (e)=>{
+  if(!selected) return;
+  const f = e.target.files?.[0];
+  if(!f) return;
+
+  const idx = items.findIndex(x=>x.OrderCode===selected.OrderCode);
+  items[idx].Attachments = items[idx].Attachments || [];
+
+  // Demo: nếu là ảnh <= 1.5MB thì lưu dataUrl để xem lại được
+  const isImg = f.type.startsWith("image/");
+  const smallEnough = f.size <= 1.5 * 1024 * 1024;
+
+  if(isImg && smallEnough){
+    const dataUrl = await fileToDataUrl_(f);
+    items[idx].Attachments.push({ name:f.name, type:f.type, size:f.size, at: nowStr(), by: getUserName(), dataUrl });
+  } else {
+    // File lớn/khác: chỉ lưu metadata (tránh localStorage nổ)
+    items[idx].Attachments.push({ name:f.name, type:f.type, size:f.size, at: nowStr(), by: getUserName() });
+    alert("Demo: file không phải ảnh nhỏ -> chỉ lưu tên file (không lưu nội dung).");
+  }
+
+  saveData(items);
+  selected = items[idx];
+  renderAttachments_();
+  render();
+
+  elFile.value = "";
+};
+
+function fileToDataUrl_(file){
+  return new Promise((resolve,reject)=>{
+    const r = new FileReader();
+    r.onload = ()=> resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
 render();
