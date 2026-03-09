@@ -64,11 +64,22 @@
         <hr style="border:0;border-top:1px solid #243244;margin:12px 0">
         <div class="row" style="align-items:flex-start">
           <div style="flex:1">
-            <div class="small" style="margin-bottom:6px">Ghi chú / Comment</div>
-            <textarea id="note" placeholder="Nhập ghi chú..."></textarea>
-            <div class="row" style="margin-top:10px; justify-content:flex-end">
-              <button id="saveNote">Lưu</button>
-            </div>
+            <div class="small" style="margin-bottom:6px">Trao đổi</div>
+
+<div id="commentList" style="display:flex;flex-direction:column;gap:10px;max-height:240px;overflow:auto;padding:10px;border:1px solid #243244;border-radius:12px;background:#0b1220"></div>
+
+<textarea id="note" placeholder="Nhập comment... (Enter để xuống dòng)"></textarea>
+
+<div class="row" style="margin-top:10px; justify-content:space-between">
+  <div class="row">
+    <input id="file" type="file" style="display:none" />
+    <button id="attach">Attach file</button>
+  </div>
+  <button id="saveNote">Lưu comment</button>
+</div>
+
+<div class="small" style="margin-top:10px;margin-bottom:6px">File đính kèm</div>
+<div id="attachList" class="meta"></div>
           </div>
           <div style="width:260px">
             <div class="small" style="margin-bottom:6px">Thông tin nhanh</div>
