@@ -1,6 +1,6 @@
 const STAGES = [
-  "1.Báo giá","2.Kiểm tra","3.Làm thầu","4.Nộp thầu","5.Hợp đồng",
-  "6.Đặt hàng","7.Giao hàng","8.Nghiệm thu","9.Xuất hóa đơn","9a.Hoàn tất","9b.Thất bại"
+  "Cơ hội","1.Báo giá","2.Kiểm tra","3.Làm thầu","4.Nộp thầu","5.Hợp đồng",
+  "6.Đặt hàng","7.Giao hàng","8.Nghiệm thu","9.Xuất hóa đơn","9a.Hoàn tất","9b.Thất bại","Có bảo trì","Ký quỹ thu lại"
 ];
 
 const seed = [
