@@ -81,7 +81,21 @@ function applyFilters(list){
     return true;
   });
 }
-
+function nowStr(){
+  const d = new Date();
+  const pad = (n)=> String(n).padStart(2,"0");
+  return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+function getUserName(){
+  // demo: lưu tên người dùng trong localStorage
+  const k = "KANBAN_DEMO_USER";
+  let name = localStorage.getItem(k);
+  if(!name){
+    name = prompt("Nhập tên bạn (để hiển thị khi comment):","") || "Unknown";
+    localStorage.setItem(k, name);
+  }
+  return name;
+}
 function render(){
   // sales dropdown
   const sales = uniq(items.map(x=>x.SaleOwner));
