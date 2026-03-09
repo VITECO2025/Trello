@@ -141,7 +141,14 @@ function render(){
     elBoard.appendChild(col);
   });
 }
-
+// Cuộn ngang bằng con lăn chuột
+elBoard.addEventListener("wheel", (e) => {
+  // Nếu đang cuộn dọc thì chuyển thành cuộn ngang
+  if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+    e.preventDefault();
+    elBoard.scrollLeft += e.deltaY;
+  }
+}, { passive: false });
 function openModal(orderCode){
   selected = items.find(x=>x.OrderCode===orderCode);
   if(!selected) return;
