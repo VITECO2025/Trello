@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kanban Demo</title>
+    <script type="module" src="./app.js"></script>
+    <style>
+      body { font-family: system-ui, Arial; margin: 0; background:#0b1220; color:#e5e7eb; }
+      .top { display:flex; gap:8px; padding:12px; position:sticky; top:0; background:#0b1220; border-bottom:1px solid #1f2937; }
+      input, select { padding:10px; border-radius:10px; border:1px solid #334155; background:#0f172a; color:#e5e7eb; }
+      .board { display:flex; gap:12px; padding:12px; overflow:auto; height: calc(100vh - 62px); }
+      .col { min-width: 280px; background:#0f172a; border:1px solid #243244; border-radius:16px; padding:10px; display:flex; flex-direction:column; gap:10px; }
+      .col h3 { margin:0; font-size:14px; color:#cbd5e1; display:flex; justify-content:space-between; }
+      .list { display:flex; flex-direction:column; gap:10px; }
+      .card { background:#111c33; border:1px solid #22314a; border-radius:14px; padding:10px; cursor:grab; }
+      .card:active { cursor:grabbing; }
+      .t1 { font-weight:700; font-size:13px; }
+      .meta { font-size:12px; color:#9ca3af; display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+      .pill { border:1px solid #334155; padding:2px 8px; border-radius:999px; }
+      .danger { border-color:#ef4444; color:#fecaca; }
+      .modal { position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.55); padding:12px; }
+      .modal.show { display:grid; }
+      .panel { width:min(720px, 100%); background:#0f172a; border:1px solid #243244; border-radius:18px; padding:14px; }
+      textarea { width:100%; min-height:90px; border-radius:12px; border:1px solid #334155; background:#0b1220; color:#e5e7eb; padding:10px; }
+      .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+      button { padding:10px 12px; border-radius:12px; border:1px solid #334155; background:#111c33; color:#e5e7eb; cursor:pointer; }
+      button:hover { border-color:#64748b; }
+      .small { font-size:12px; color:#94a3b8; }
+    </style>
+  </head>
+  <body>
+    <div class="top">
+      <input id="q" placeholder="Tìm: KD123 / khách / tên đơn / sale" />
+      <select id="sale">
+        <option value="">Tất cả Sale</option>
+      </select>
+      <select id="deadline">
+        <option value="">Deadline: tất cả</option>
+        <option value="overdue">Quá hạn</option>
+        <option value="7days">7 ngày tới</option>
+      </select>
+      <select id="pct">
+        <option value="">%: tất cả</option>
+        <option value="0-30">0–30%</option>
+        <option value="30-70">30–70%</option>
+        <option value="70-100">70–100%</option>
+      </select>
+      <button id="reset">Reset demo</button>
+      <span class="small">Demo độc lập, không chạm Google Sheet</span>
+    </div>
+
+    <div id="board" class="board"></div>
+
+    <div id="modal" class="modal">
+      <div class="panel">
+        <div class="row" style="justify-content:space-between">
+          <div>
+            <div id="mTitle" class="t1"></div>
+            <div id="mMeta" class="meta"></div>
+          </div>
+          <button id="close">Đóng</button>
+        </div>
+        <hr style="border:0;border-top:1px solid #243244;margin:12px 0">
+        <div class="row" style="align-items:flex-start">
+          <div style="flex:1">
+            <div class="small" style="margin-bottom:6px">Ghi chú / Comment</div>
+            <textarea id="note" placeholder="Nhập ghi chú..."></textarea>
+            <div class="row" style="margin-top:10px; justify-content:flex-end">
+              <button id="saveNote">Lưu</button>
+            </div>
+          </div>
+          <div style="width:260px">
+            <div class="small" style="margin-bottom:6px">Thông tin nhanh</div>
+            <div id="quick" class="meta"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
